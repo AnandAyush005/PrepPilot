@@ -1,6 +1,8 @@
-# <img src="./frontend/public/PrepPilot-Logo.png" alt="PrepPilot Logo" width="40" height="40" style="vertical-align: middle; margin-right: 10px;"> PrepPilot - AI-Powered Interview Preparation Platform
-
 <div align="center">
+
+<img src="./frontend/public/PrepPilot-Logo.png" alt="PrepPilot Logo" width="100" height="100" style="margin-bottom: 20px;">
+
+# PrepPilot - AI-Powered Interview Preparation Platform
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](http://makeapullrequest.com)
