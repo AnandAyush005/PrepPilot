@@ -1,4 +1,4 @@
-# ![PrepPilot Logo](./frontend/public/PrepPilot-Logo.png) PrepPilot - AI-Powered Interview Preparation Platform
+# <img src="./frontend/public/PrepPilot-Logo.png" alt="PrepPilot Logo" width="40" height="40" style="vertical-align: middle; margin-right: 10px;"> PrepPilot - AI-Powered Interview Preparation Platform
 
 <div align="center">
 
