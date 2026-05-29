@@ -5,9 +5,26 @@ const Question = require("../models/Question");
 const MAX_SESSIONS = Number(process.env.MAX_SESSIONS) || 50;;
 
 
-// @desc    Create a new session and linked questions
-// @route   POST /api/sessions/create
-// @access  Private
+/**
+ * Create a new practice session and associated questions.
+ * @route POST /api/sessions/create
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @returns {Promise<void>}
+ * @throws {Error} When required fields are missing or user exceeds session limits.
+ * @example
+ * POST /api/sessions/create
+ * Authorization: Bearer eyJhb...
+ * {
+ *   "role": "Backend Engineer",
+ *   "experience": "3 years",
+ *   "topicsToFocus": ["Node.js","Databases"],
+ *   "description": "Prepare for backend interview",
+ *   "question": [{"question":"Explain ACID properties","answer":"..."}]
+ * }
+ * @example
+ * 201 {"success": true, "session": {"_id":"...","role":"Backend Engineer",...}}
+ */
 exports.createSession = async (req, res) => {
   try {
   const {role , experience , topicsToFocus , description , question }= req.body;
@@ -55,9 +72,19 @@ exports.createSession = async (req, res) => {
   }
 };
 
-// @desc    Get all sessions for the logged-in user
-// @route   GET /api/sessions/my-sessions
-// @access  Private
+/**
+ * Get all sessions for the authenticated user.
+ * @route GET /api/sessions/my-sessions
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @returns {Promise<void>}
+ * @throws {Error} When fetch fails.
+ * @example
+ * GET /api/sessions/my-sessions
+ * Authorization: Bearer eyJhb...
+ * @example
+ * 200 [{"_id":"...","role":"...","questions":[...]}]
+ */
 exports.getMySessions = async (req, res) => {
     try {
       const session = await Session.find({ user: req.user.id })
@@ -70,9 +97,19 @@ exports.getMySessions = async (req, res) => {
     }
 };
 
-// @desc    Get a session by ID with populated questions
-// @route   GET /api/sessions/:id
-// @access  Private
+/**
+ * Get a specific session by ID with populated questions.
+ * @route GET /api/sessions/:id
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @returns {Promise<void>}
+ * @throws {Error} When session is not found.
+ * @example
+ * GET /api/sessions/6426c5a5...
+ * Authorization: Bearer eyJhb...
+ * @example
+ * 200 {"success": true, "session": {"_id":"...","questions":[...]}}
+ */
 exports.getSessionById = async (req, res) => {
     try {
   const session = await Session.findById(req.params.id)
@@ -92,9 +129,19 @@ exports.getSessionById = async (req, res) => {
   }
 };
 
-// @desc    Delete a session and its questions
-// @route   DELETE /api/sessions/:id
-// @access  Private
+/**
+ * Delete a session and all linked questions for the authenticated user.
+ * @route DELETE /api/sessions/:id
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @returns {Promise<void>}
+ * @throws {Error} When session is missing or not owned by user.
+ * @example
+ * DELETE /api/sessions/6426c5a5...
+ * Authorization: Bearer eyJhb...
+ * @example
+ * 200 {"message":"Session delete sucessfully"}
+ */
 exports.deleteSession = async (req, res) => {
     try {
     const session = await Session.findById(req.params.id);

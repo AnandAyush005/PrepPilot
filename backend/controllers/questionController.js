@@ -1,9 +1,25 @@
 const Question = require("../models/Question");
 const Session = require("../models/Session");
 
-// @desc    Add additional questions to an existing session
-// @route   POST /api/questions/add
-// @access  Private
+/**
+ * Add additional questions to an existing session.
+ * @route POST /api/questions/add
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @returns {Promise<void>}
+ * @throws {Error} When sessionId or questions are invalid, or session is missing.
+ * @example
+ * POST /api/questions/add
+ * Authorization: Bearer eyJhb...
+ * {
+ *   "sessionId": "6426c5a5...",
+ *   "questions": [
+ *     {"question": "What is polymorphism?", "answer": "..."}
+ *   ]
+ * }
+ * @example
+ * 201 [{"_id":"...","session":"...","question":"...","answer":"..."}]
+ */
 const addQuestionToSession = async (req, res) => {
   try {
     const { sessionId, questions } = req.body;
@@ -31,9 +47,19 @@ const addQuestionToSession = async (req, res) => {
   }
 };
 
-// @desc    Pin or unpin a question
-// @route   POST /api/questions/:id/pin
-// @access  Private
+/**
+ * Toggle the pinned state of a question.
+ * @route POST /api/questions/:id/pin
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @returns {Promise<void>}
+ * @throws {Error} When question is not found or server error occurs.
+ * @example
+ * POST /api/questions/6426c5a5.../pin
+ * Authorization: Bearer eyJhb...
+ * @example
+ * 200 {"success": true, "question": {"_id": "...", "isPinned": true, ...}}
+ */
 const togglePinQuestion = async (req, res) => {
   try {
     const question = await Question.findById(req.params.id);
@@ -52,6 +78,22 @@ const togglePinQuestion = async (req, res) => {
 };
 
 
+/**
+ * Update the note field for a question.
+ * @route POST /api/questions/:id/note
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @returns {Promise<void>}
+ * @throws {Error} When question is not found or server error occurs.
+ * @example
+ * POST /api/questions/6426c5a5.../note
+ * Authorization: Bearer eyJhb...
+ * {
+ *   "note": "Add more details about the answer flow."
+ * }
+ * @example
+ * 200 {"success": true, "question": {"_id": "...","note":"..."}}
+ */
 const updateQuestionNote = async (req, res) => {
   try {
     const { note } = req.body;

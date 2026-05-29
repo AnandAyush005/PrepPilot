@@ -2,13 +2,39 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+/**
+ * Generate a JWT token for the authenticated user.
+ * @param {string} userId - MongoDB user ID.
+ * @returns {string} JWT token valid for 7 days.
+ */
 const generateToken = (userId) => {
     return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
 
-// @desc Register a new user
-// @route POST /api/auth/register
-// @access Public
+/**
+ * Register a new user account.
+ * @route POST /api/auth/register
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @returns {Promise<void>}
+ * @throws {Error} When the server fails to create a user.
+ * @example
+ * POST /api/auth/register
+ * {
+ *   "name": "Jane Doe",
+ *   "email": "jane@example.com",
+ *   "password": "securePass123",
+ *   "profileImageUrl": "https://example.com/avatar.png"
+ * }
+ * @example
+ * 201 {
+ *   "_id": "6426c5a5...",
+ *   "name": "Jane Doe",
+ *   "email": "jane@example.com",
+ *   "profileImageUrl": "https://example.com/avatar.png",
+ *   "token": "eyJhb..."
+ * }
+ */
 const registerUser = async (req, res) => {
     try {
         const { name, email, password, profileImageUrl } = req.body;
@@ -45,9 +71,29 @@ const registerUser = async (req, res) => {
 // @desc Login user
 // @route POST /api/auth/login
 // @access Public
+/**
+ * Authenticate a user and return a JWT token.
+ * @route POST /api/auth/login
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @returns {Promise<void>}
+ * @throws {Error} When authentication fails or server error occurs.
+ * @example
+ * POST /api/auth/login
+ * {
+ *   "email": "jane@example.com",
+ *   "password": "securePass123"
+ * }
+ * @example
+ * 200 {
+ *   "_id": "6426c5a5...",
+ *   "name": "Jane Doe",
+ *   "email": "jane@example.com",
+ *   "profileImageUrl": "https://example.com/avatar.png",
+ *   "token": "eyJhb..."
+ * }
+ */
 const loginUser = async (req, res) => {
-    try{
-        const {email,password}= req.body;
         const user = await User.findOne({email});
         if(!user){
             return res.status(400).json({message:"Invalid email or password"})
@@ -75,9 +121,25 @@ const loginUser = async (req, res) => {
 // @desc Get user profile
 // @route GET /api/auth/profile
 // @access Private (Require JWT)
+/**
+ * Get the profile of the currently authenticated user.
+ * @route GET /api/auth/profile
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @returns {Promise<void>}
+ * @throws {Error} When the user is not found or server error occurs.
+ * @example
+ * GET /api/auth/profile
+ * Authorization: Bearer eyJhb...
+ * @example
+ * 200 {
+ *   "_id": "6426c5a5...",
+ *   "name": "Jane Doe",
+ *   "email": "jane@example.com",
+ *   "profileImageUrl": "https://example.com/avatar.png"
+ * }
+ */
 const getUserProfile = async (req, res) => {
-     try{
-        const user = await User.findById(req.user.id).select("-password");
         if(!user){
             return res.status(404).json({message:"User not found"});
         }
