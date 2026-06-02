@@ -56,45 +56,35 @@ const App = () => {
           <Router>
             <AnimatePresence mode="wait">
               <Routes>
-                <Route
-                  path="/"
-                  element={
-                    <PageTransition>
-                      <LandingPage />
-                    </PageTransition>
-                  }
-                />
-                <Route
-                  path="/login"
-                  element={
-                    <PageTransition>
-                      <Login />
-                    </PageTransition>
-                  }
-                />
                 {/* Routes without Sidebar */}
                 <Route
                   path="/"
                   element={
-                    <PageTransition>
-                      <LandingPage />
-                    </PageTransition>
+                    <ErrorBoundary>
+                      <PageTransition>
+                        <LandingPage />
+                      </PageTransition>
+                    </ErrorBoundary>
                   }
                 />
                 <Route
                   path="/login"
                   element={
-                    <PageTransition>
-                      <Login />
-                    </PageTransition>
+                    <ErrorBoundary>
+                      <PageTransition>
+                        <Login />
+                      </PageTransition>
+                    </ErrorBoundary>
                   }
                 />
                 <Route
                   path="/interview-prep/:sessionId"
                   element={
-                    <PageTransition>
-                      <InterviewPrep />
-                    </PageTransition>
+                    <ErrorBoundary>
+                      <PageTransition>
+                        <InterviewPrep />
+                      </PageTransition>
+                    </ErrorBoundary>
                   }
                 />
                 <Route
@@ -105,9 +95,11 @@ const App = () => {
                   path="/resume-builder/:id"
                   element={
                     <ProtectedRoute>
-                      <PageTransition>
-                        <ResumeEditor />
-                      </PageTransition>
+                      <ErrorBoundary>
+                        <PageTransition>
+                          <ResumeEditor />
+                        </PageTransition>
+                      </ErrorBoundary>
                     </ProtectedRoute>
                   }
                 />
@@ -127,6 +119,10 @@ const App = () => {
                         <ProgressTrackerDashboard />
                       </PageTransition>
                     }
+                  />
+                  <Route
+                    path="/layout-test-error"
+                    element={<BuggyComponent />}
                   />
                   <Route
                     path="/ai-helper"
