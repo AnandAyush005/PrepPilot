@@ -2,7 +2,6 @@ import Compiler from "./components/Compiler";
 import SkillAssessment from "./components/SkillAssessment";
 import DsaSheet from "./components/SheetDetailsPage";
 import SheetList from "./components/SheetList";
-// ...existing code...
 import UserProvider from "./context/userContext";
 import ThemeProvider from "./context/themeContext";
 import React from "react";
@@ -32,6 +31,7 @@ import RepositoryHive from "./pages/OpenSource/RepositoryHive";
 import OSSBlog from "./pages/OpenSource/OSSBlog";
 import OpenSourceEvents from "./pages/OpenSource/OpenSourceEvents";
 import NotesBooks from "./pages/NotesBooks/NotesBooks";
+import Settings from "./pages/Settings/Settings";
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useContext(UserContext);
@@ -50,23 +50,6 @@ const App = () => {
           <Router>
             <AnimatePresence mode="wait">
               <Routes>
-                <Route
-                  path="/"
-                  element={
-                    <PageTransition>
-                      <LandingPage />
-                    </PageTransition>
-                  }
-                />
-                <Route
-                  path="/login"
-                  element={
-                    <PageTransition>
-                      <Login />
-                    </PageTransition>
-                  }
-                />
-                {/* Routes without Sidebar */}
                 <Route
                   path="/"
                   element={
@@ -102,7 +85,6 @@ const App = () => {
                   }
                 />
 
-                {/* Routes with Sidebar (MainLayout) */}
                 <Route
                   element={
                     <MainLayout>
@@ -268,6 +250,16 @@ const App = () => {
                       <PageTransition>
                         <NotesBooks />
                       </PageTransition>
+                    }
+                  />
+                  <Route
+                    path="/settings"
+                    element={
+                      <ProtectedRoute>
+                        <PageTransition>
+                          <Settings />
+                        </PageTransition>
+                      </ProtectedRoute>
                     }
                   />
                 </Route>

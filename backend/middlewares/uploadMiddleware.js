@@ -14,15 +14,32 @@ const storage = multer.diskStorage({
 
 // File filter
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+  console.log("FILE:", file.originalname);
+  console.log("MIMETYPE:", file.mimetype);
+
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/jpg",
+    "image/webp"
+  ];
+
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Only .jpeg, .jpg and .png formats are allowed"), false);
+    console.log("REJECTED:", file.mimetype);
+    cb(new Error(`Unsupported type: ${file.mimetype}`), false);
   }
 };
 
 // Initialize upload
+
+const fs = require("fs");
+
+if (!fs.existsSync("uploads")) {
+  fs.mkdirSync("uploads");
+}
+
 const upload = multer({
   storage,
   fileFilter,
