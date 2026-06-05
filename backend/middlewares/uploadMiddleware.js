@@ -1,6 +1,12 @@
 const multer = require("multer");
+const fs = require("fs");
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
+
+// Create uploads directory if it doesn't exist
+if (!fs.existsSync("uploads")) {
+  fs.mkdirSync("uploads");
+}
 
 // Configure storage
 const diskStorage = multer.diskStorage({
@@ -14,11 +20,21 @@ const diskStorage = multer.diskStorage({
 
 // File filter for image uploads
 const imageFileFilter = (req, file, cb) => {
-  const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+  console.log("FILE:", file.originalname);
+  console.log("MIMETYPE:", file.mimetype);
+
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/jpg",
+    "image/webp",
+  ];
+
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Only .jpeg, .jpg and .png formats are allowed"), false);
+    console.log("REJECTED:", file.mimetype);
+    cb(new Error(`Unsupported type: ${file.mimetype}`), false);
   }
 };
 
@@ -38,7 +54,7 @@ const upload = multer({
   limits: { fileSize: MAX_FILE_SIZE },
 });
 
-// Upload instance for resumes (memory storage, buffer needed by controller)
+// Upload instance for resumes (memory storage)
 const uploadResume = multer({
   storage: multer.memoryStorage(),
   fileFilter: resumeFileFilter,
