@@ -14,7 +14,9 @@ export const UserProvider = ({ children }) => {
     useEffect(() => {
         if (user) return;
 
-        const accessToken = localStorage.getItem("token");
+        const accessToken =
+  localStorage.getItem("token") ||
+  sessionStorage.getItem("token");
         if (!accessToken) {
             setLoading(false);
             return;
@@ -52,6 +54,7 @@ export const UserProvider = ({ children }) => {
         setUser(null);
         setSheetProgress([]);
         localStorage.removeItem("token");
+sessionStorage.removeItem("token");
     };
     // Optionally, add a function to refresh sheet progress
     const refreshSheetProgress = async () => {
