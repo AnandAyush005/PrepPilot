@@ -10,6 +10,24 @@ import { UserContext } from "../../context/userContext";
 import uploadImage from "../../utils/uploadimage";
 import { LuArrowRight } from "react-icons/lu";
 
+const passwordChecks = {
+  length: password.length >= 8,
+  uppercase: /[A-Z]/.test(password),
+  lowercase: /[a-z]/.test(password),
+  number: /[0-9]/.test(password),
+  special: /[@$!%*?&]/.test(password),
+};
+
+const strengthScore =
+  Object.values(passwordChecks).filter(Boolean).length;
+
+const passwordStrength =
+  strengthScore <= 2
+    ? "Weak"
+    : strengthScore <= 4
+      ? "Medium"
+      : "Strong";
+
 const SignUp = ({ setCurrentPage }) => {
   const [profilePic, setProfilePic] = useState(null);
   const [fullName, setFullName] = useState("");
@@ -180,6 +198,111 @@ const SignUp = ({ setCurrentPage }) => {
                 Sign in
               </button>
             </p>
+        {/* Full Name Input */}
+        <Input
+
+  value={fullName}
+  onChange={({ target }) => setFullName(target.value)}
+  label="Full Name"
+  placeholder="John Doe"
+  type="text"
+  aria-invalid={!!error && !fullName}
+  aria-describedby={error && !fullName ? "signup-error" : undefined}
+/>
+
+          value={fullName}
+          onChange={({ target }) => setFullName(target.value)}
+          label="Full Name"
+          placeholder="John Doe"
+          type="text"
+          autoFocus
+        />
+
+        {/* Email Input */}
+        <Input
+          value={email}
+          onChange={({ target }) => setEmail(target.value)}
+          label="Email Address"
+          placeholder="your@email.com"
+          type="text"
+        />
+
+        {/* Password Input */}
+        <Input
+          value={password}
+          onChange={({ target }) => setPassword(target.value)}
+          label="Password"
+          placeholder="Min 8 characters"
+          type="password"
+        />
+
+        {password && (
+          <div className="mt-3">
+            {/* Strength Meter */}
+            <div className="flex justify-between text-sm mb-2">
+              <span className="text-gray-400">Password Strength</span>
+              <span
+                className={`font-medium ${passwordStrength === "Weak"
+                    ? "text-red-400"
+                    : passwordStrength === "Medium"
+                      ? "text-yellow-400"
+                      : "text-green-400"
+                  }`}
+              >
+                {passwordStrength}
+              </span>
+            </div>
+
+            <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+              <div
+                className={`h-full transition-all duration-300 ${passwordStrength === "Weak"
+                    ? "bg-red-500"
+                    : passwordStrength === "Medium"
+                      ? "bg-yellow-500"
+                      : "bg-green-500"
+                  }`}
+                style={{ width: `${strengthScore * 20}%` }}
+              />
+            </div>
+
+            {/* Requirements */}
+            <div className="mt-3 text-sm space-y-1">
+              <p className="text-gray-300 font-medium">
+                Password Requirements
+              </p>
+
+              <div className={passwordChecks.length ? "text-green-400" : "text-gray-400"}>
+                {passwordChecks.length ? "✅" : "❌"} Minimum 8 characters
+              </div>
+
+              <div className={passwordChecks.uppercase ? "text-green-400" : "text-gray-400"}>
+                {passwordChecks.uppercase ? "✅" : "❌"} Uppercase letter
+              </div>
+
+              <div className={passwordChecks.lowercase ? "text-green-400" : "text-gray-400"}>
+                {passwordChecks.lowercase ? "✅" : "❌"} Lowercase letter
+              </div>
+
+              <div className={passwordChecks.number ? "text-green-400" : "text-gray-400"}>
+                {passwordChecks.number ? "✅" : "❌"} Number
+              </div>
+
+              <div className={passwordChecks.special ? "text-green-400" : "text-gray-400"}>
+                {passwordChecks.special ? "✅" : "❌"} Special character
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Error Message */}
+        {error && (
+          <div
+  id="signup-error"
+  role="alert"
+  aria-live="polite"
+  className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg"
+>
+            <p className="text-red-400 text-sm font-medium">{error}</p>
           </div>
         </div>
       ) : (
