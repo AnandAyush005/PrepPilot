@@ -5,9 +5,7 @@ import { modalVariants, backdropVariants } from "../../utils/animations";
 const Modal = ({ children, isOpen, onClose, title, hideHeader }) => {
   useEffect(() => {
     const handleEsc = (e) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
+      if (e.key === "Escape") onClose();
     };
 
     if (isOpen) {
@@ -27,7 +25,7 @@ const Modal = ({ children, isOpen, onClose, title, hideHeader }) => {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50 flex justify-center items-center bg-black/40 overflow-y-auto p-4 pt-8"
+          className="fixed inset-0 z-50 flex justify-center items-center bg-black/40 p-4"
           variants={backdropVariants}
           initial="initial"
           animate="animate"
@@ -35,7 +33,7 @@ const Modal = ({ children, isOpen, onClose, title, hideHeader }) => {
           onClick={onClose}
         >
           <motion.div
-            className="relative flex flex-col bg-white dark:bg-[#151c2f] border border-gray-100 dark:border-white/10 shadow-2xl rounded-2xl lg:w-[35vw] w-[90vw] max-w-lg p-6 md:p-8 max-h-[90vh] overflow-y-auto"
+            className="relative flex flex-col bg-white dark:bg-[#151c2f] border border-gray-100 dark:border-white/10 shadow-2xl rounded-2xl lg:w-[35vw] w-[90vw] max-w-lg p-6 md:p-8 max-h-[90vh]"
             variants={modalVariants}
             initial="initial"
             animate="animate"
@@ -44,9 +42,7 @@ const Modal = ({ children, isOpen, onClose, title, hideHeader }) => {
           >
             {!hideHeader && (
               <div className="flex items-center justify-between mb-4 border-b border-gray-200 dark:border-white/10 pb-3">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                  {title}
-                </h3>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">{title}</h3>
               </div>
             )}
 
@@ -60,7 +56,8 @@ const Modal = ({ children, isOpen, onClose, title, hideHeader }) => {
               ✕
             </button>
 
-            <div className="w-full overflow-y-auto max-h-[90vh] pr-1">
+            {/* scrollbar-hide hides the bar visually while still allowing scroll if content overflows */}
+            <div className="w-full overflow-y-auto scrollbar-hide">
               {children}
             </div>
           </motion.div>
