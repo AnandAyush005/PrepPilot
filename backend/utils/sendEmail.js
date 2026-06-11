@@ -5,6 +5,8 @@ const nodemailer = require("nodemailer");
  * Supports "gmail", "ethereal", or any custom SMTP provider.
  * Set EMAIL_SERVICE in .env to switch between providers.
  */
+console.log("EMAIL_SERVICE:", process.env.EMAIL_SERVICE);
+
 const createTransporter = () => {
     const service = process.env.EMAIL_SERVICE?.toLowerCase();
 
@@ -13,6 +15,7 @@ const createTransporter = () => {
             host: "smtp.gmail.com",
             port: 465,
             secure: true, // SSL — works on Render (port 587 is blocked)
+            family: 4, // Force IPv4
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS,
@@ -25,6 +28,7 @@ const createTransporter = () => {
             host: "smtp.ethereal.email",
             port: 587,
             secure: false,
+            family: 4, // Force IPv4
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS,
