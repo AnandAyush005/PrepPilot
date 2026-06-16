@@ -1,29 +1,20 @@
+const sanitizeField = (value) => {
+  if (typeof value !== "string") return value;
+
+  return value
+    .replace(/<[^>]*>?/gm, "")
+    .replace(/[^\x20-\x7E\n]/g, "")
+    .trim();
+};
 
 const sanitizeAiPrompt = (req, res, next) => {
   if (req.body) {
-    if (typeof req.body.prompt === "string") {
-      req.body.prompt = req.body.prompt
-        .replace(/<[^>]*>?/gm, "")        // remove HTML tags
-        .replace(/[^\x20-\x7E\n]/g, "")   // remove hidden control chars
-        .trim();
-    }
-    
-    if (typeof req.body.role === "string") {
-      req.body.role = req.body.role
-        .replace(/<[^>]*>?/gm, "")        // remove HTML tags
-        .replace(/[^\x20-\x7E\n]/g, "")   // remove hidden control chars
-        .trim();
-    }
-    
-    if (typeof req.body.topic === "string") {
-      req.body.topic = req.body.topic
-        .replace(/<[^>]*>?/gm, "")        // remove HTML tags
-        .replace(/[^\x20-\x7E\n]/g, "")   // remove hidden control chars
-        .trim();
-    }
+    req.body.prompt = sanitizeField(req.body.prompt);
+    req.body.role = sanitizeField(req.body.role);
+    req.body.topic = sanitizeField(req.body.topic);
   }
 
   next();
 };
 
-module.exports = {sanitizeAiPrompt};
+module.exports = sanitizeAiPrompt;
