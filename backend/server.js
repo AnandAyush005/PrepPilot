@@ -70,6 +70,7 @@ app.use((req, res, next) => {
     return res.sendStatus(200);
   }
   next();
+});
 
 connectDB()
   .then((success) => {
