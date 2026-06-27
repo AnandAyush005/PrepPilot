@@ -15,6 +15,10 @@ const protect = async (req, res, next) => {
       // Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+      if (decoded.tokenType && decoded.tokenType !== "access") {
+        return res.status(401).json({ message: "Invalid token type" });
+      }
+
       // Find user by ID (exclude password)
       req.user = await User.findById(decoded.id).select("-password");
 

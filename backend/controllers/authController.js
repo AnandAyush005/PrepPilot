@@ -5,13 +5,27 @@ const crypto = require("crypto");
 const { sendVerificationEmail } = require("../utils/sendEmail");
 const { validatePassword } = require('../utils/passwordPolicy');
 
+const ACCESS_TOKEN_EXPIRY = "15m";
+const REFRESH_TOKEN_EXPIRY = "7d";
+const REFRESH_TOKEN_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+const REFRESH_TOKEN_SALT_ROUNDS = 10;
+
 /**
- * Generate a JWT token for the authenticated user.
+ * Generate an access token for the authenticated user.
  * @param {string} userId - MongoDB user ID.
- * @returns {string} JWT token valid for 7 days.
+ * @returns {string} JWT access token valid for 15 minutes.
  */
-const generateToken = (userId) => {
-    return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
+const generateAccessToken = (userId) => {
+    return jwt.sign({ id: userId, tokenType: "access" }, process.env.JWT_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRY });
+};
+
+/**
+ * Generate a refresh token for the authenticated user.
+ * @param {string} userId - MongoDB user ID.
+ * @returns {string} JWT refresh token valid for 7 days.
+ */
+const generateRefreshToken = (userId) => {
+    return jwt.sign({ id: userId, tokenType: "refresh" }, process.env.JWT_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRY });
 };
 
 /**
@@ -65,12 +79,19 @@ const registerUser = async (req, res) => {
             isEmailVerified: true, // skip email verification until SMTP is configured
         });
 
-        const token = generateToken(user._id);
+        const accessToken = generateAccessToken(user._id);
+        const refreshToken = generateRefreshToken(user._id);
+
+        user.refreshTokenHash = hashToken(refreshToken);
+        user.refreshTokenExpiresAt = new Date(Date.now() + REFRESH_TOKEN_MAX_AGE_MS);
+        await user.save();
 
         return res.status(201).json({
             success: true,
             message: "Account created successfully. You can now log in.",
-            token,
+            token: accessToken,
+            accessToken,
+            refreshToken,
             _id: user._id,
             name: user.name,
             email: user.email,
@@ -109,13 +130,121 @@ const loginUser = async (req, res) => {
             });
         }
 
+        const accessToken = generateAccessToken(user._id);
+        const refreshToken = generateRefreshToken(user._id);
+
+        user.refreshTokenHash = hashToken(refreshToken);
+        user.refreshTokenExpiresAt = new Date(Date.now() + REFRESH_TOKEN_MAX_AGE_MS);
+        await user.save();
+
         res.json({
+            success: true,
             _id: user._id,
             name: user.name,
             email: user.email,
             profileImageUrl: user.profileImageUrl,
-            token: generateToken(user._id),
+            token: accessToken,
+            accessToken,
+            refreshToken,
         });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Internal server error occurred", error: error.message });
+    }
+};
+
+const refreshToken = async (req, res) => {
+    try {
+        const { refreshToken: incomingRefreshToken } = req.body;
+
+        if (!incomingRefreshToken) {
+            return res.status(400).json({ success: false, message: "Refresh token is required." });
+        }
+
+        let decoded;
+        try {
+            decoded = jwt.verify(incomingRefreshToken, process.env.JWT_SECRET);
+        } catch (error) {
+            return res.status(401).json({ success: false, message: "Refresh token is invalid or expired." });
+        }
+
+        if (decoded.tokenType !== "refresh") {
+            return res.status(401).json({ success: false, message: "Refresh token is invalid." });
+        }
+
+        const user = await User.findById(decoded.id);
+        if (!user) {
+            return res.status(401).json({ success: false, message: "User not found." });
+        }
+
+        if (!user.refreshTokenHash || !user.refreshTokenExpiresAt || new Date(user.refreshTokenExpiresAt) < new Date()) {
+            user.refreshTokenHash = null;
+            user.refreshTokenExpiresAt = null;
+            await user.save();
+            return res.status(401).json({ success: false, message: "Refresh token has expired. Please log in again." });
+        }
+
+        const refreshIsValid = await bcrypt.compare(incomingRefreshToken, user.refreshTokenHash);
+        if (!refreshIsValid) {
+            user.refreshTokenHash = null;
+            user.refreshTokenExpiresAt = null;
+            await user.save();
+            return res.status(401).json({ success: false, message: "Refresh token has been revoked. Please log in again." });
+        }
+
+        const accessToken = generateAccessToken(user._id);
+        const rotatedRefreshToken = generateRefreshToken(user._id);
+
+        user.refreshTokenHash = await bcrypt.hash(rotatedRefreshToken, REFRESH_TOKEN_SALT_ROUNDS);
+        user.refreshTokenExpiresAt = new Date(Date.now() + REFRESH_TOKEN_MAX_AGE_MS);
+        await user.save();
+
+        res.json({
+            success: true,
+            message: "Token refreshed successfully.",
+            token: accessToken,
+            accessToken,
+            refreshToken: rotatedRefreshToken,
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Internal server error occurred", error: error.message });
+    }
+};
+
+const logoutUser = async (req, res) => {
+    try {
+        const { refreshToken: incomingRefreshToken } = req.body;
+
+        if (!incomingRefreshToken) {
+            return res.status(400).json({ success: false, message: "Refresh token is required." });
+        }
+
+        let decoded;
+        try {
+            decoded = jwt.verify(incomingRefreshToken, process.env.JWT_SECRET);
+        } catch (error) {
+            return res.status(401).json({ success: false, message: "Refresh token is invalid or expired." });
+        }
+
+        const user = await User.findById(decoded.id);
+        if (!user) {
+            return res.status(401).json({ success: false, message: "User not found." });
+        }
+
+        if (user.refreshTokenHash) {
+            const refreshIsValid = await bcrypt.compare(incomingRefreshToken, user.refreshTokenHash);
+            if (!refreshIsValid) {
+                user.refreshTokenHash = null;
+                user.refreshTokenExpiresAt = null;
+                await user.save();
+                return res.status(401).json({ success: false, message: "Refresh token has already been revoked." });
+            }
+        }
+
+        user.refreshTokenHash = null;
+        user.refreshTokenExpiresAt = null;
+        await user.save();
+
+        res.json({ success: true, message: "User logged out successfully." });
     } catch (error) {
         res.status(500).json({ success: false, message: "Internal server error occurred", error: error.message });
     }
@@ -366,4 +495,4 @@ const deleteUserAccount = async (req, res) => {
     }
 };
 
-module.exports = { registerUser, loginUser, verifyEmail, resendVerificationEmail, getUserProfile, updateUserProfile, changePassword, deleteUserAccount };
+module.exports = { registerUser, loginUser, refreshToken, logoutUser, verifyEmail, resendVerificationEmail, getUserProfile, updateUserProfile, changePassword, deleteUserAccount };

@@ -60,7 +60,7 @@ Whether you're preparing for your dream job or sharpening your technical skills,
 | 💡 **Project Ideas**                  | Explore curated project ideas to enhance your portfolio                       |
 | 🔗 **Open Source Resources**          | Contribute and learn from open-source projects                                |
 | 📊 **Progress Dashboard**             | Track your preparation metrics and identify weak areas                        |
-| 🔐 **Secure Authentication**          | JWT-based authentication with encrypted passwords                             |
+| 🔐 **Secure Authentication**          | Two-token authentication with short-lived access tokens, rotating refresh tokens, and secure logout support |
 | 📱 **Fully Responsive**               | Seamless experience across desktop, tablet, and mobile devices                |
 | 🎨 **Modern Dark Mode**               | Beautiful UI with theme toggle for comfortable viewing                        |
 | ⚡ **Real-time Feedback**             | Instant AI-powered explanations and answer evaluations                        |
@@ -86,6 +86,7 @@ React 18 (Hooks & Functional Components)
 Node.js + Express.js
 ├── MongoDB + Mongoose (Data persistence)
 ├── JWT & Bcryptjs (Security & authentication)
+├── Access/Refresh token rotation for secure session handling
 ├── Google Gemini API (AI intelligence)
 ├── Multer (File uploads)
 ├── PDF-Parse (Document processing)
@@ -154,6 +155,10 @@ MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/preppilot
 
 # JWT Secret (generate a strong random string)
 JWT_SECRET=your_super_secret_jwt_key_here_generate_a_strong_one
+
+# Auth token behavior is handled by the backend using:
+# - short-lived access tokens (15 minutes)
+# - rotating refresh tokens (7 days)
 
 # Google Gemini API
 GEMINI_API_KEY=your_gemini_api_key_from_ai_studio

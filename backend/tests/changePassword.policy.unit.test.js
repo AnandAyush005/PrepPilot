@@ -8,13 +8,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 // we want to assert that the real policy logic is exercised.
 // ---------------------------------------------------------------------------
 
-vi.mock("../models/User.js", () => ({ default: { findById: vi.fn() } }));
+vi.mock("../models/User.js", () => ({ findById: vi.fn() }));
 vi.mock("bcryptjs", () => ({
-  default: {
-    compare: vi.fn(),
-    genSalt: vi.fn().mockResolvedValue("salt"),
-    hash: vi.fn().mockResolvedValue("hashed"),
-  },
+  compare: vi.fn(),
+  genSalt: vi.fn().mockResolvedValue("salt"),
+  hash: vi.fn().mockResolvedValue("hashed"),
 }));
 
 let changePassword;
@@ -27,10 +25,13 @@ beforeEach(async () => {
 
   // Re-import after reset so mocks are fresh
   const ctrl = await import("../controllers/authController.js");
-  changePassword = ctrl.changePassword;
+  changePassword = ctrl.changePassword ?? ctrl.default?.changePassword;
 
-  User = (await import("../models/User.js")).default;
-  bcrypt = (await import("bcryptjs")).default;
+  const UserModule = await import("../models/User.js");
+  User = UserModule.default ?? UserModule;
+
+  const bcryptModule = await import("bcryptjs");
+  bcrypt = bcryptModule.default ?? bcryptModule;
 });
 
 // ---------------------------------------------------------------------------
