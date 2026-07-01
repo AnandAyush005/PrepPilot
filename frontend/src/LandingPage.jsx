@@ -482,12 +482,12 @@ const LandingPage = () => {
           </div>
 
           {/* 3 equal columns */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 px-4 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 px-4 max-w-7xl mx-auto items-stretch">
 
             {/* ── CARD 1: Personalized Recommendations ── */}
-            <FadeIn delay={0.05}>
-              <div className="flex flex-col rounded-2xl overflow-hidden border border-white/8 bg-[#0f0f14]">
-                <div className="p-5 flex flex-col gap-2.5 border-b border-white/6">
+            <FadeIn delay={0.05} className="flex h-full">
+              <div className="flex flex-col w-full h-full rounded-2xl overflow-hidden border border-white/8 bg-[#0f0f14]">
+                <div className="flex-1 p-5 flex flex-col gap-2.5 border-b border-white/6">
                   {[
                     { label: "Frontend Engineer Track",  sub: "React · TypeScript · Performance" },
                     { label: "System Design Deep Dive",  sub: "HLD · LLD · Scalability"          },
@@ -516,9 +516,9 @@ const LandingPage = () => {
             </FadeIn>
 
             {/* ── CARD 2: AI Assistance ── */}
-            <FadeIn delay={0.12}>
-              <div className="flex flex-col rounded-2xl overflow-hidden border border-white/8 bg-[#0f0f14]">
-                <div className="p-5 border-b border-white/6 flex flex-col gap-3">
+            <FadeIn delay={0.12} className="flex h-full">
+              <div className="flex flex-col w-full h-full rounded-2xl overflow-hidden border border-white/8 bg-[#0f0f14]">
+                <div className="flex-1 p-5 border-b border-white/6 flex flex-col gap-3">
                   {/* Simulated chat messages */}
                   <div className="flex gap-3 items-start">
                     <div className="w-6 h-6 rounded-full bg-gray-700 flex-shrink-0 flex items-center justify-center">
@@ -560,9 +560,9 @@ const LandingPage = () => {
             </FadeIn>
 
             {/* ── CARD 3: Precision Filters ── */}
-            <FadeIn delay={0.2}>
-              <div className="flex flex-col rounded-2xl overflow-hidden border border-white/8 bg-[#0f0f14]">
-                <div className="p-5 flex flex-col gap-3 border-b border-white/6">
+            <FadeIn delay={0.2} className="flex h-full">
+              <div className="flex flex-col w-full h-full rounded-2xl overflow-hidden border border-white/8 bg-[#0f0f14]">
+                <div className="flex-1 p-5 flex flex-col gap-3 border-b border-white/6">
                   {[
                     {
                       label: "Difficulty",
