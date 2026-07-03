@@ -4,6 +4,7 @@ const router = express.Router();
 const GITHUB_OWNER = "KaranUnique";
 const GITHUB_REPO = "Free-programming-books";
 const BRANCH = "main";
+const ALLOWED_DOWNLOAD_HOSTS = new Set(["raw.githubusercontent.com"]);
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
 
 async function fetchJson(url) {
@@ -122,8 +123,26 @@ router.get("/", async (_req, res) => {
  */
 router.get("/download", (req, res) => {
   const { url } = req.query;
-  if (!url) return res.status(400).json({ message: "url query is required" });
-  return res.redirect(url);
+  if (typeof url !== "string" || !url.trim()) {
+    return res.status(400).json({ message: "url query is required" });
+  }
+
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(url);
+  } catch {
+    return res.status(400).json({ message: "url query must be a valid URL" });
+  }
+
+  if (parsedUrl.protocol !== "https:") {
+    return res.status(403).json({ message: "download URL must use https" });
+  }
+
+  if (!ALLOWED_DOWNLOAD_HOSTS.has(parsedUrl.hostname)) {
+    return res.status(403).json({ message: "download URL host is not allowed" });
+  }
+
+  return res.redirect(parsedUrl.toString());
 });
 
 module.exports = router;
