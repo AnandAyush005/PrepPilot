@@ -26,6 +26,7 @@ import {
   BookMarked,
   CalendarDays,
   ScrollText,
+  Grid3x3,
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -58,6 +59,19 @@ const Sidebar = () => {
           title: "Cognitive Builder",
           path: "/aptitude",
           icon: BrainCircuit,
+        },
+      ],
+    },
+    {
+      id: "cognitive-skills",
+      title: "Cognitive Skills",
+      isHeader: true,
+      items: [
+        {
+          id: "cognitive-games",
+          title: "Cognitive Games",
+          path: "/cognitive-games",
+          icon: Grid3x3,
         },
       ],
     },
@@ -185,7 +199,7 @@ const Sidebar = () => {
   ];
 
   const handleServiceClick = (item) => {
-    if (item.title === "Cognitive Builder" && !user) {
+    if ((item.title === "Cognitive Builder" || item.title === "Cognitive Games") && !user) {
       setShowLoginModal(true);
     } else {
       navigate(item.path);
