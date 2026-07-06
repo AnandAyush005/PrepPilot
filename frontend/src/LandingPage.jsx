@@ -242,6 +242,7 @@ const LandingPage = () => {
   const [pendingRoute, setPendingRoute] = useState(null);
   const [activeStep, setActiveStep] = useState(1);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [openSignupModal, setOpenSignupModal] = useState(false);
 
   const [visibleCards, setVisibleCards] = useState(3);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -305,6 +306,14 @@ const LandingPage = () => {
     }
   };
 
+  const handleSignup = () => {
+    if (!user) {
+      setOpenSignupModal(true);
+    } else {
+      navigate("/dashboard");
+    }
+  };
+
   const navRoutes = [
     { label: "AI-Assistance", route: "/ai-helper" },
     { label: "Cognitive Skills", route: "/practice" },
@@ -321,6 +330,7 @@ const LandingPage = () => {
       navigate(route);
     }
   };
+
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 300);
@@ -415,7 +425,7 @@ const LandingPage = () => {
                   </button>
                   {/* Get Started – solid violet pill */}
                   <button
-                    onClick={handleCTA}
+                    onClick={handleSignup}
                     className="cursor-pointer flex items-center gap-2 text-white text-sm font-semibold px-5 py-2 rounded-xl transition-all duration-150"
                     style={{
                       background:
@@ -475,7 +485,7 @@ const LandingPage = () => {
           <FadeIn delay={0.22}>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <button
-                onClick={handleCTA}
+                onClick={handleSignup}
                 className="cursor-pointer cta-glow flex items-center gap-2 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 text-white font-semibold px-8 py-3.5 rounded-full text-base transition-all duration-200"
               >
                 <span className="font-mono text-xs text-violet-200">&gt;_</span>
@@ -789,7 +799,7 @@ const LandingPage = () => {
 
                             {/* Animated button */}
                             <motion.button
-                              onClick={handleCTA}
+                              onClick={handleSignup}
                               whileHover={{
                                 scale: 1.05,
                                 boxShadow: "0 0 30px rgba(139,92,246,0.6)",
@@ -921,7 +931,7 @@ const LandingPage = () => {
               preparation with PrepPilot AI.
             </p>
             <button
-              onClick={handleCTA}
+              onClick={handleSignup}
               className="cursor-pointer cta-glow inline-flex items-center gap-3 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 text-white font-bold px-10 py-4 rounded-full text-base transition-all duration-200"
             >
               <span className="font-mono text-xs text-violet-200">&gt;_</span>
@@ -1097,6 +1107,37 @@ const LandingPage = () => {
           
           <div className={currentPage === "signup" ? "block" : "hidden"}>
             <SignUp setCurrentPage={setCurrentPage} />
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={openSignupModal}
+        onClose={() => {
+          setOpenSignupModal(false);
+          setPendingRoute(null);
+        }}
+        hideHeader
+      >
+        <div>
+          <div className={`${currentPage === "login" ? "block" : "hidden"} cursor-pointer`}>
+            <SignUp
+              setCurrentPage={setCurrentPage}
+              onLoginSuccess={() => {
+                setOpenAuthModal(false);
+          
+                if (pendingRoute) {
+                  navigate(pendingRoute);
+                  setPendingRoute(null);
+                } else {
+                  navigate("/dashboard");
+                }
+              }}
+            />
+          </div>
+          
+          <div className={currentPage === "signup" ? "block" : "hidden"}>
+            <Login setCurrentPage={setCurrentPage} />
           </div>
         </div>
       </Modal>
