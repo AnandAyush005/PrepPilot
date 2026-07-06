@@ -39,10 +39,6 @@ const generateInterviewQuestions = async (req, res) => {
   try {
     const { role, experience, topicsToFocus, numberOfQuestions } = req.body;
 
-    if (!role || !experience || !topicsToFocus || !numberOfQuestions) {
-      return res.status(400).json({ message: "Missing required fields" });
-    }
-
     // Fetch questions the user has already seen for this role + topic
     const pastSessions = await Session.find({
       user: req.user._id,
@@ -161,9 +157,6 @@ const generateInterviewQuestions = async (req, res) => {
 const generateConceptExplanation = async (req, res) => {
   try {
     const { question } = req.body;
-    if (!question) {
-      return res.status(400).json({ message: "Missing question" });
-    }
 
     const prompt = conceptExplainPrompt(question);
 
@@ -232,10 +225,6 @@ const generateConceptExplanation = async (req, res) => {
 const generateInterviewTips = async (req, res) => {
   try {
     const { role, experience } = req.body;
-
-    if (!role || !experience) {
-      return res.status(400).json({ message: "Missing required fields" });
-    }
 
     const prompt = interviewTipsPrompt({ role, experience });
 
