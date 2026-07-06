@@ -43,7 +43,7 @@ const allowedOrigins = new Set(originEnvList);
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   const renderPattern =
-    /^https:\/\/(?:interview-prep(?:aration)?-ai|preppilot-backend)-[a-z0-9-]+\.onrender\.com$/;
+    /^https:\/\/(?:interview-prep(?:aration)?-ai|preppilot(?:-backend)?)-[a-z0-9-]+\.onrender\.com$/;
   const localhostPattern =
     /^http:\/\/(localhost|127\.0\.0\.1):(5\d{3}|3\d{3})$/;
   if (
@@ -104,21 +104,26 @@ app.use("/api/user", generalLimiter, userSheetProgressRoutes);
 const achievementRoutes = require("./routes/achievementRoutes");
 app.use("/api/user", generalLimiter, achievementRoutes);
 const booksRoutes = require("./routes/booksRoutes");
-const { required } = require("joi");
+const { validateGenerateInterviewQuestions, validateGenerateConceptExplanation, validateGenerateInterviewTips } = require("./Input_validators/ValidateAi.js");
 app.use("/api/resume", generalLimiter, resumeRoutes);
+
+// AI routes with Zod validation
 app.use(
   "/api/ai/generate-questions",
   sensitiveRouteHeaders,
   aiLimiter,
   protect,
-  generateInterviewQuestions,
+  validateGenerateInterviewQuestions, // Zod validator
+  generateInterviewQuestions          // Controller
 );
+
 app.use(
   "/api/ai/generate-explanation",
   sensitiveRouteHeaders,
   aiLimiter,
   protect,
-  generateConceptExplanation,
+  validateGenerateConceptExplanation, // Zod validator
+  generateConceptExplanation          // Controller
 );
 
 app.use(
@@ -126,8 +131,10 @@ app.use(
   sensitiveRouteHeaders,
   aiLimiter,
   protect,
-  generateInterviewTips,
+  validateGenerateInterviewTips,      // Zod validator
+  generateInterviewTips               // Controller
 );
+
 
 app.use("/api/books", generalLimiter, booksRoutes);
 app.use("/api/jobs", generalLimiter, jobRoutes);
